@@ -8,15 +8,17 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.AppCompatTextView
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.TextView
 
 
 class Demo1Activity : AppCompatActivity() {
-    private lateinit var ivUserAvatar: ImageView
+    private lateinit var ivUserAvatar: TextView
     private var EXPAND_AVATAR_SIZE: Float = 0F
     private var COLLAPSE_IMAGE_SIZE: Float = 0F
     private var horizontalToolbarAvatarMargin: Float = 0F
@@ -32,6 +34,8 @@ class Demo1Activity : AppCompatActivity() {
     private var avatarCollapseAnimationChangeWeight: Float = 0F
     private var isCalculated = false
     private var verticalToolbarAvatarMargin =0F
+    private var appBarHeight = 0F
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,14 +61,19 @@ class Demo1Activity : AppCompatActivity() {
                         avatarAnimateStartPointY = Math.abs((appBarLayout.height - (EXPAND_AVATAR_SIZE + horizontalToolbarAvatarMargin)) / appBarLayout.totalScrollRange)
                         avatarCollapseAnimationChangeWeight = 1 / (1 - avatarAnimateStartPointY)
                         verticalToolbarAvatarMargin = (toolbar.height - COLLAPSE_IMAGE_SIZE) * 2
+//                        verticalToolbarAvatarMargin = (toolbar.height/2).toFloat()
+
                         isCalculated = true
                     }
+                    Log.d("qwe appBarLayout.height", appBarLayout.height.toString())
+                    Log.d("qwe i", i.toString())
+                    Log.d("qwe totalScrollRange", appBarLayout.totalScrollRange.toString())
+                    Log.d("qwe strartY", avatarAnimateStartPointY.toString())
+
+
                     /**/
                     updateViews(Math.abs(i / appBarLayout.totalScrollRange.toFloat()))
                 })
-        findViewById<Button>(R.id.b_go_demo_2).setOnClickListener {
-            startActivity(Intent(this@Demo1Activity, Demo2Activity::class.java))
-        }
     }
 
     private fun updateViews(offset: Float) {
@@ -94,6 +103,7 @@ class Demo1Activity : AppCompatActivity() {
                         TO_EXPANDED ->  {
                             /* set avatar on start position (center of parent frame layout)*/
                             ivUserAvatar.translationX = 0F
+//                            ivUserAvatar.translationY = Math.abs((appBarLayout.height - (EXPAND_AVATAR_SIZE + horizontalToolbarAvatarMargin)) / appBarLayout.totalScrollRange)
                             /**/
                             background.setBackgroundColor(ContextCompat.getColor(this@Demo1Activity, R.color.color_transparent))
                             /* hide top titles on toolbar*/
@@ -123,6 +133,7 @@ class Demo1Activity : AppCompatActivity() {
             ivUserAvatar.apply {
                 when {
                     offset > avatarAnimateStartPointY -> {
+                        //размер аватарки в свернутом тулбаре
                         val avatarCollapseAnimateOffset = (offset - avatarAnimateStartPointY) * avatarCollapseAnimationChangeWeight
                         val avatarSize = EXPAND_AVATAR_SIZE - (EXPAND_AVATAR_SIZE - COLLAPSE_IMAGE_SIZE) * avatarCollapseAnimateOffset
                         this.layoutParams.also {
@@ -131,8 +142,9 @@ class Demo1Activity : AppCompatActivity() {
                         }
                         invisibleTextViewWorkAround.setTextSize(TypedValue.COMPLEX_UNIT_PX, offset)
 
-                        this.translationX = ((appBarLayout.width - horizontalToolbarAvatarMargin - avatarSize) / 2) * avatarCollapseAnimateOffset
-                        this.translationY = ((toolbar.height  - verticalToolbarAvatarMargin - avatarSize ) / 2) * avatarCollapseAnimateOffset
+                        this.translationX = 0f
+                        this.translationY = ((toolbar.height) / 2).toFloat()
+                        this.textSize = 14f
                     }
                     else -> this.layoutParams.also {
                         if (it.height != EXPAND_AVATAR_SIZE.toInt()) {
@@ -141,6 +153,7 @@ class Demo1Activity : AppCompatActivity() {
                             this.layoutParams = it
                         }
                         translationX = 0f
+//                        translationY = avatarAnimateStartPointY
                     }
                 }
             }
